@@ -34,18 +34,46 @@ Alarm-Clock/
 
 ## How to Run
 
-1. Clone or download the repository.
-2. Make sure `alarm.mp3` is in the same folder as `main.py`.
-3. Open the project in VS Code.
-4. Run:
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/shweshd/Alarm-Clock.git
+```
+
+### 2. Open the project folder
+
+```bash
+cd Alarm-Clock
+```
+
+### 3. Install the required package
+
+```bash
+pip install playsound
+```
+
+### 4. Run the program
 
 ```bash
 python main.py
 ```
 
-5. Enter the number of minutes and seconds.
-6. When the countdown reaches `00:00`, the alarm will start.
-7. Press **Space** to stop the alarm.
+### 5. Set the alarm
+
+Enter the number of minutes and seconds when prompted:
+
+```text
+How many minutes to wait: 0
+How many seconds to wait: 10
+```
+
+The countdown will begin.
+
+### 6. Stop the alarm
+
+When the countdown reaches `00:00`, the alarm sound will play continuously.
+
+Press **Space** to stop the alarm.
 
 ## Example
 
