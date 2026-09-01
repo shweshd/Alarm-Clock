@@ -2,6 +2,8 @@
 
 A simple **Python alarm clock** mini project that lets the user set a countdown timer and plays an alarm sound continuously when the timer reaches zero.
 
+<img src="https://github.com/user-attachments/assets/9a6979e1-6bef-4fd3-b9a0-624349e29098" width="400">
+
 ## Features
 
 * Set alarm time using minutes and seconds
