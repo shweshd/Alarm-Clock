@@ -1,57 +1,216 @@
-from playsound import playsound
+import tkinter as tk
+from tkinter import messagebox
 import time
 import threading
-import msvcrt
+from playsound import playsound
 
-CLEAR = "\033[2J"
-CLEAR_AND_RETURN = "\033[H"
+
+# -----------------------------
+# Alarm sound
+# -----------------------------
+
+alarm_running = False
 
 
 def play_alarm():
-    while True:
+    global alarm_running
+
+    while alarm_running:
         playsound("alarm.mp3")
 
 
-def alarm(seconds):
-    time_elapsed = 0
+# -----------------------------
+# Countdown
+# -----------------------------
 
-    print(CLEAR)
+def start_alarm():
+    global alarm_running
 
-    while time_elapsed < seconds:
-        time.sleep(1)
-        time_elapsed += 1
+    try:
+        minutes = int(minutes_entry.get())
+        seconds = int(seconds_entry.get())
 
-        time_left = seconds - time_elapsed
-        minutes_left = time_left // 60
-        seconds_left = time_left % 60
+        if minutes < 0 or seconds < 0:
+            raise ValueError
 
-        print(
-            f"{CLEAR_AND_RETURN}"
-            f"Alarm will sound in: "
-            f"{minutes_left:02d}:{seconds_left:02d}"
+        total_seconds = minutes * 60 + seconds
+
+        if total_seconds == 0:
+            messagebox.showerror(
+                "Invalid Time",
+                "Please enter a time greater than 0."
+            )
+            return
+
+    except ValueError:
+        messagebox.showerror(
+            "Invalid Input",
+            "Please enter valid numbers."
+        )
+        return
+
+    start_button.config(state="disabled")
+    minutes_entry.config(state="disabled")
+    seconds_entry.config(state="disabled")
+
+    countdown(total_seconds)
+
+
+def countdown(total_seconds):
+    if total_seconds > 0:
+        minutes_left = total_seconds // 60
+        seconds_left = total_seconds % 60
+
+        timer_label.config(
+            text=f"{minutes_left:02d}:{seconds_left:02d}"
         )
 
-    print("\nALARM! Press SPACE to stop.")
+        root.after(
+            1000,
+            countdown,
+            total_seconds - 1
+        )
 
-    # Start alarm sound in background
-    alarm_thread = threading.Thread(target=play_alarm, daemon=True)
-    alarm_thread.start()
-
-    # Wait for Space
-    while True:
-        if msvcrt.kbhit():
-            key = msvcrt.getch()
-
-            if key == b" ":
-                print("Alarm stopped.")
-                break
-
-        time.sleep(0.1)
+    else:
+        timer_label.config(text="00:00")
+        alarm()
 
 
-minutes = int(input("How many minutes to wait: "))
-seconds = int(input("How many seconds to wait: "))
+# -----------------------------
+# Start alarm sound
+# -----------------------------
 
-total_seconds = minutes * 60 + seconds
+def alarm():
+    global alarm_running
 
-alarm(total_seconds)
+    alarm_running = True
+
+    stop_button.config(state="normal")
+
+    threading.Thread(
+        target=play_alarm,
+        daemon=True
+    ).start()
+
+
+# -----------------------------
+# Stop alarm
+# -----------------------------
+
+def stop_alarm():
+    global alarm_running
+
+    alarm_running = False
+
+    stop_button.config(state="disabled")
+    start_button.config(state="normal")
+
+    minutes_entry.config(state="normal")
+    seconds_entry.config(state="normal")
+
+    timer_label.config(text="00:00")
+
+
+# -----------------------------
+# GUI
+# -----------------------------
+
+root = tk.Tk()
+
+root.title("Alarm Clock")
+root.geometry("400x400")
+root.resizable(False, False)
+
+
+# Title
+
+title_label = tk.Label(
+    root,
+    text="ALARM CLOCK",
+    font=("Arial", 24, "bold")
+)
+
+title_label.pack(pady=30)
+
+
+# Minutes
+
+minutes_label = tk.Label(
+    root,
+    text="Minutes",
+    font=("Arial", 12)
+)
+
+minutes_label.pack()
+
+minutes_entry = tk.Entry(
+    root,
+    width=10,
+    font=("Arial", 16),
+    justify="center"
+)
+
+minutes_entry.pack(pady=5)
+
+
+# Seconds
+
+seconds_label = tk.Label(
+    root,
+    text="Seconds",
+    font=("Arial", 12)
+)
+
+seconds_label.pack()
+
+seconds_entry = tk.Entry(
+    root,
+    width=10,
+    font=("Arial", 16),
+    justify="center"
+)
+
+seconds_entry.pack(pady=5)
+
+
+# Timer
+
+timer_label = tk.Label(
+    root,
+    text="00:00",
+    font=("Arial", 40, "bold")
+)
+
+timer_label.pack(pady=20)
+
+
+# Start button
+
+start_button = tk.Button(
+    root,
+    text="SET ALARM",
+    font=("Arial", 12, "bold"),
+    command=start_alarm,
+    width=15
+)
+
+start_button.pack(pady=5)
+
+
+# Stop button
+
+stop_button = tk.Button(
+    root,
+    text="STOP ALARM",
+    font=("Arial", 12, "bold"),
+    command=stop_alarm,
+    width=15,
+    state="disabled"
+)
+
+stop_button.pack(pady=5)
+
+
+# Start GUI
+
+root.mainloop()
